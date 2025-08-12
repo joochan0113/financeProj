@@ -1,0 +1,7 @@
+# 데이터와 차트 제외
+data/
+charts/
+*.parquet
+*.csv
+*.png
+*.html
