@@ -5,3 +5,6 @@ charts/
 *.csv
 *.png
 *.html
+.env
+local_storage/
+.ipynb_checkpoints/
