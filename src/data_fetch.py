@@ -60,7 +60,9 @@ def fetch_cg(session: requests.Session, coin_id: str, days: int = 365, retries: 
             if "prices" not in j or not j["prices"]:
                 raise ValueError("no prices key")
             df = pd.DataFrame(j["prices"], columns=["timestamp", "price"])
-            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+            # 경고 해결: 문자열일 수도 있으니 숫자로 캐스팅 후 unit 적용
+            ts = pd.to_numeric(df["timestamp"], errors="coerce")
+            df["timestamp"] = pd.to_datetime(ts, unit="ms")
             df.set_index("timestamp", inplace=True)
             return df["price"]
         except Exception as e:
@@ -155,7 +157,9 @@ if __name__ == "__main__":
         r = requests.get("https://api.alternative.me/fng/", params={"limit": 0, "format": "json"}, timeout=30)
         r.raise_for_status()
         fng = pd.DataFrame(r.json()["data"])
-        fng["timestamp"] = pd.to_datetime(fng["timestamp"], unit="s")
+        # 경고 해결: 문자열일 수도 있으니 숫자로 캐스팅 후 unit 적용
+        ts = pd.to_numeric(fng["timestamp"], errors="coerce")
+        fng["timestamp"] = pd.to_datetime(ts, unit="s")
         fng = fng.sort_values("timestamp").set_index("timestamp")
         fng["value"] = pd.to_numeric(fng["value"], errors="coerce")
         save_df(fng, "fear_greed_index", where="processed")
